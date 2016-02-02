@@ -53,14 +53,16 @@ public class HomeController
 
 		return "index";
 	}
-	
+
 	@RequestMapping(value = "/librarian", method = RequestMethod.GET)
-	public String librarian(Locale locale, Model model) throws SQLException {
+	public String librarian(Locale locale, Model model) throws SQLException
+	{
 		return "librarian";
 	}
 
 	@RequestMapping(value = "/borrower", method = RequestMethod.GET)
-	public String borrower(Locale locale, Model model) throws SQLException {
+	public String borrower(Locale locale, Model model) throws SQLException
+	{
 		return "borrower";
 	}
 
@@ -250,11 +252,16 @@ public class HomeController
 
 		books = (List<Book>) adminService.getAllBooks(pageNo, pageSize, searchString);
 
-		StringBuffer sb = new StringBuffer("<table class='table' id='booksTable'><thead><tr><th>#</th><th>Book Title</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
+		StringBuffer sb = new StringBuffer("<table class='table' id='booksTable'><thead><tr><th>#</th><th>Book Title</th><th>Library</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
 		for (Book book : books)
-			sb.append("<tr><td>" + book.getBookId() + "</td><td>" + book.getTitle()
-					+ "</td><td align='center'><button type='button' class='btn btn btn-primary' data-toggle='modal' data-target='#myModal1' href='editBook?bookId=" + book.getBookId()
-					+ "'>Edit Book</button></td><td><button type='button' class='btn btn-sm btn-danger' onclick=\"javascript:location.href='deleteBook?bookId=" + book.getBookId()
+			sb.append("<tr><td>"
+					+ book.getBookId()
+					+ "</td><td>"
+					+ book.getTitle()
+					+ "</td><td align='center'><a href='viewBookLibrary?bookId="
+					+ book.getBookId()
+					+ "'><button type='button' class='btn btn btn-primary' >See in Library</button></a></td><td align='center'><button type='button' class='btn btn btn-primary' data-toggle='modal' data-target='#myModal1' href='editBook?bookId="
+					+ book.getBookId() + "'>Edit Book</button></td><td><button type='button' class='btn btn-sm btn-danger' onclick=\"javascript:location.href='deleteBook?bookId=" + book.getBookId()
 					+ "';\">Delete Book</button></td></tr>");
 
 		sb.append("<table>");
@@ -267,14 +274,14 @@ public class HomeController
 	{
 
 		int Count = adminService.getAllAuthorsCount();
-		List<Author> authors  = adminService.getAllAuthors(1, Count, new String());
+		List<Author> authors = adminService.getAllAuthors(1, Count, new String());
 		List<Genre> genres = adminService.getAllGenre();
 		List<Publisher> publishers = adminService.getAllPublisher();
-	
+
 		model.addAttribute("authors", authors);
 		model.addAttribute("genres", genres);
 		model.addAttribute("publishers", publishers);
-		
+
 		return "addbook";
 	}
 
@@ -285,12 +292,12 @@ public class HomeController
 		String genres = webRequest.getParameter("genres");
 		String title = webRequest.getParameter("title");
 		String publisher = webRequest.getParameter("publisher");
-		
-		String status = adminService.addBook(title,authors,genres,publisher);
-		
+
+		String status = adminService.addBook(title, authors, genres, publisher);
+
 		return "status";
 	}
-	
+
 	@RequestMapping(value = "/viewGenre", method = RequestMethod.GET)
 	public String viewGenre(Locale locale, Model model, WebRequest webRequest) throws SQLException
 	{
@@ -432,24 +439,23 @@ public class HomeController
 		}
 		return "deletegenre";
 	}
-	
+
 	@RequestMapping(value = "/viewBranch", method = RequestMethod.GET)
-	public String viewBranch(Locale locale, Model model, WebRequest webRequest)
-			throws SQLException {
+	public String viewBranch(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 
 		int count = adminService.getAllBranchesCount();
-		String s = adminService.pagination("/training/getBranch", new String(),
-				count, 10);
+		String s = adminService.pagination("/training/getBranch", new String(), count, 10);
 
 		model.addAttribute("pagination", s);
 
-		return "viewBranch";
+		return "viewbranch";
 
 	}
 
 	@RequestMapping(value = "/getBranch", method = RequestMethod.GET)
-	public String getBranchData(Locale locale, Model model,
-			WebRequest webRequest) throws SQLException {
+	public String getBranchData(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 
 		List<Branch> lb;
 
@@ -457,22 +463,14 @@ public class HomeController
 		int pageSize = Integer.parseInt(webRequest.getParameter("pageSize"));
 		String searchString = webRequest.getParameter("searchString");
 
-		lb = (List<Branch>) adminService.getAllBranches(pageNo,
-				pageSize, searchString);
+		lb = (List<Branch>) adminService.getAllBranches(pageNo, pageSize, searchString);
 
-		StringBuffer sb = new StringBuffer(
-				"<table class='table' id='booksTable'><thead><tr><th>#</th><th>Branch Name</th><th>Branch Address</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
+		StringBuffer sb = new StringBuffer("<table class='table' id='booksTable'><thead><tr><th>#</th><th>Branch Name</th><th>Branch Address</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
 		for (Branch lbs : lb)
-			sb.append("<tr><td>"
-					+ lbs.getBranchId()
-					+ "</td><td>"
-					+ lbs.getBranchName()
-					+ "</td><td>"
-					+ lbs.getBranchAddress()
-					+ "</td><td align='center'><button type='button' class='btn btn btn-primary' data-toggle='modal' data-target='#myModal1' href='editBranch?branchId="
-					+ lbs.getBranchId()
-					+ "'>Edit Branch</button></td><td><button type='button' class='btn btn-sm btn-danger' onclick=\"javascript:location.href='deleteBranch?branchId="
-					+ lbs.getBranchId() + "';\">Delete Branch</button></td></tr>");
+			sb.append("<tr><td>" + lbs.getBranchId() + "</td><td>" + lbs.getBranchName() + "</td><td>" + lbs.getBranchAddress()
+					+ "</td><td align='center'><button type='button' class='btn btn btn-primary' data-toggle='modal' data-target='#myModal1' href='editBranch?branchId=" + lbs.getBranchId()
+					+ "'>Edit Branch</button></td><td><button type='button' class='btn btn-sm btn-danger' onclick=\"javascript:location.href='deleteBranch?branchId=" + lbs.getBranchId()
+					+ "';\">Delete Branch</button></td></tr>");
 
 		sb.append("<table>");
 		model.addAttribute("result", sb.toString());
@@ -480,59 +478,64 @@ public class HomeController
 	}
 
 	@RequestMapping(value = "/searchBranch", method = RequestMethod.GET)
-	public String searchBranch(Locale locale, Model model, WebRequest webRequest)
-			throws SQLException {
+	public String searchBranch(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 
 		String searchString = webRequest.getParameter("searchString");
 		int count = adminService.getBooksCountByTitle(searchString);
-		String s = adminService.pagination("/training/getBranch", searchString,
-				count, 10);
+		String s = adminService.pagination("/training/getBranch", searchString, count, 10);
 
 		model.addAttribute("pagination", s);
 		model.addAttribute("searchResult", searchString);
-		return "viewBranch";
+		return "viewbranch";
 
 	}
 
 	@RequestMapping(value = "/editBranch", method = RequestMethod.GET)
-	public String editBranch(Locale locale, Model model, WebRequest webRequest)
-			throws SQLException {
+	public String editBranch(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 
 		String branchId = webRequest.getParameter("branchId");
-		if (branchId == null) {
+		if (branchId == null)
+		{
 			String error = "Please Provide Branch Id1";
 			model.addAttribute("error", error);
 			return error;
 		}
 
-		try {
-			Branch lb = adminService.getBranchById(Integer
-					.parseInt(branchId));
+		try
+		{
+			Branch lb = adminService.getBranchById(Integer.parseInt(branchId));
 			model.addAttribute("BranchName", lb.getBranchName());
 			model.addAttribute("BranchAddress", lb.getBranchAddress());
 			model.addAttribute("BranchId", branchId);
-		} catch (Exception E) {
+		}
+		catch (Exception E)
+		{
 			String error = "Please Provide Branch Id2";
 			model.addAttribute("error", error);
 			return error;
 
 		}
-		return "editBranch";
+		return "editbranch";
 
 	}
 
 	@RequestMapping(value = "/editBranch", method = RequestMethod.POST)
-	public String editBranchPost(Locale locale, Model model,
-			WebRequest webRequest) throws SQLException {
+	public String editBranchPost(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 
 		Integer branchId = Integer.parseInt(webRequest.getParameter("branchId"));
 		String BranchName = webRequest.getParameter("BranchName");
 		String BranchAddress = webRequest.getParameter("BranchAddress");
 
-		try {
+		try
+		{
 			adminService.updateBranch(branchId, BranchName, BranchAddress);
 			model.addAttribute("status", "success");
-		} catch (Exception E) {
+		}
+		catch (Exception E)
+		{
 			model.addAttribute("status", "Error");
 		}
 		return "status";
@@ -540,60 +543,64 @@ public class HomeController
 	}
 
 	@RequestMapping(value = "/addBranch", method = RequestMethod.GET)
-	public String addBranch(Locale locale, Model model, WebRequest webRequest)
-			throws SQLException {
-		return "addBranch";
+	public String addBranch(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
+		return "addbranch";
 	}
 
 	@RequestMapping(value = "/addBranch", method = RequestMethod.POST)
-	public String addBranchPost(Locale locale, Model model,
-			WebRequest webRequest) throws SQLException {
+	public String addBranchPost(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 		String BranchName = webRequest.getParameter("BranchName");
 		String BranchAddress = webRequest.getParameter("BranchAddress");
 
-		try {
+		try
+		{
 			adminService.addBranch(BranchName, BranchAddress);
 			model.addAttribute("status", "success");
-		} catch (Exception E) {
+		}
+		catch (Exception E)
+		{
 			model.addAttribute("status", "Error");
 		}
 		return "status";
 	}
 
 	@RequestMapping(value = "/deleteBranch", method = RequestMethod.GET)
-	public String deleteBranch(Locale locale, Model model, WebRequest webRequest)
-			throws SQLException {
+	public String deleteBranch(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 		int branchId = Integer.parseInt(webRequest.getParameter("branchId"));
 
-		try {
-			model.addAttribute("brancName", adminService
-					.getBranchById(branchId).getBranchName());
+		try
+		{
+			model.addAttribute("brancName", adminService.getBranchById(branchId).getBranchName());
 			String status = adminService.deleteBranch(branchId);
 			model.addAttribute("status", status);
 
-		} catch (Exception E) {
+		}
+		catch (Exception E)
+		{
 			model.addAttribute("status", "Error Deleting Book");
 		}
-		return "deleteBranch";
+		return "deletebranch";
 	}
-	
+
 	@RequestMapping(value = "/viewBorrower", method = RequestMethod.GET)
-	public String viewBorrower(Locale locale, Model model, WebRequest webRequest)
-			throws SQLException {
+	public String viewBorrower(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 
 		int count = adminService.getAllBorrowersCount();
-		String s = adminService.pagination("/training/getBorrower",
-				new String(), count, 10);
+		String s = adminService.pagination("/training/getBorrower", new String(), count, 10);
 
 		model.addAttribute("pagination", s);
 
-		return "viewBorrower";
+		return "viewborrower";
 
 	}
 
 	@RequestMapping(value = "/getBorrower", method = RequestMethod.GET)
-	public String getBorrowerData(Locale locale, Model model,
-			WebRequest webRequest) throws SQLException {
+	public String getBorrowerData(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 
 		List<Borrower> bor;
 
@@ -601,24 +608,14 @@ public class HomeController
 		int pageSize = Integer.parseInt(webRequest.getParameter("pageSize"));
 		String searchString = webRequest.getParameter("searchString");
 
-		bor = (List<Borrower>) adminService.getAllBorrowers(pageNo, pageSize,
-				searchString);
+		bor = (List<Borrower>) adminService.getAllBorrowers(pageNo, pageSize, searchString);
 
 		StringBuffer sb = new StringBuffer(
 				"<table class='table' id='borrowersTable'><thead><tr><th>#</th><th>Borrower Name</th><th>Borrower Address</th><th>Borrower phone</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
 		for (Borrower bors : bor)
-			sb.append("<tr><td>"
-					+ bors.getCardNo()
-					+ "</td><td>"
-					+ bors.getName()
-					+ "</td><td>"
-					+ bors.getAddress()
-					+ "</td><td>"
-					+ bors.getPhoneNo()
-					+ "</td><td align='center'><button type='button' class='btn btn btn-primary' data-toggle='modal' data-target='#myModal1' href='editBorrower?borId="
-					+ bors.getCardNo()
-					+ "'>Edit Borrower</button></td><td><button type='button' class='btn btn-sm btn-danger' onclick=\"javascript:location.href='deleteBorrower?borId="
-					+ bors.getCardNo()
+			sb.append("<tr><td>" + bors.getCardNo() + "</td><td>" + bors.getName() + "</td><td>" + bors.getAddress() + "</td><td>" + bors.getPhoneNo()
+					+ "</td><td align='center'><button type='button' class='btn btn btn-primary' data-toggle='modal' data-target='#myModal1' href='editBorrower?borId=" + bors.getCardNo()
+					+ "'>Edit Borrower</button></td><td><button type='button' class='btn btn-sm btn-danger' onclick=\"javascript:location.href='deleteBorrower?borId=" + bors.getCardNo()
 					+ "';\">Delete Borrower</button></td></tr>");
 
 		sb.append("<table>");
@@ -627,61 +624,66 @@ public class HomeController
 	}
 
 	@RequestMapping(value = "/searchBorrower", method = RequestMethod.GET)
-	public String searchBorrower(Locale locale, Model model,
-			WebRequest webRequest) throws SQLException {
+	public String searchBorrower(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 
 		String searchString = webRequest.getParameter("searchString");
 		int count = adminService.getBooksCountByTitle(searchString);
-		String s = adminService.pagination("/training/getBorrower",
-				searchString, count, 10);
+		String s = adminService.pagination("/training/getBorrower", searchString, count, 10);
 
 		model.addAttribute("pagination", s);
 		model.addAttribute("searchResult", searchString);
-		return "viewBorrower";
+		return "viewborrower";
 
 	}
 
 	@RequestMapping(value = "/editBorrower", method = RequestMethod.GET)
-	public String editBorrower(Locale locale, Model model, WebRequest webRequest)
-			throws SQLException {
+	public String editBorrower(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 
 		String borId = webRequest.getParameter("borId");
-		if (borId == null) {
+		if (borId == null)
+		{
 			String error = "Please Provide Borrower ID";
 			model.addAttribute("error", error);
 			return error;
 		}
 
-		try {
-			Borrower bor = adminService
-					.getBorrowerById(Integer.parseInt(borId));
+		try
+		{
+			Borrower bor = adminService.getBorrowerById(Integer.parseInt(borId));
 			model.addAttribute("borName", bor.getName());
 			model.addAttribute("borAddress", bor.getAddress());
 			model.addAttribute("borPhone", bor.getPhoneNo());
 			model.addAttribute("borId", borId);
-		} catch (Exception E) {
+		}
+		catch (Exception E)
+		{
 			String error = "Please Provide Borrower Id2";
 			model.addAttribute("error", error);
 			return error;
 
 		}
-		return "editBorrower";
+		return "editborrower";
 
 	}
 
 	@RequestMapping(value = "/editBorrower", method = RequestMethod.POST)
-	public String editBorrowerPost(Locale locale, Model model,
-			WebRequest webRequest) throws SQLException {
+	public String editBorrowerPost(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 
 		Integer borId = Integer.parseInt(webRequest.getParameter("borId"));
 		String borName = webRequest.getParameter("borName");
 		String borAddress = webRequest.getParameter("borAddress");
 		String borPhone = webRequest.getParameter("borPhone");
 
-		try {
+		try
+		{
 			adminService.updateBorrower(borId, borName, borAddress, borPhone);
 			model.addAttribute("status", "success");
-		} catch (Exception E) {
+		}
+		catch (Exception E)
+		{
 			model.addAttribute("status", "Error");
 		}
 		return "status";
@@ -689,43 +691,152 @@ public class HomeController
 	}
 
 	@RequestMapping(value = "/addBorrower", method = RequestMethod.GET)
-	public String addBorrower(Locale locale, Model model, WebRequest webRequest)
-			throws SQLException {
-		return "addBorrower";
+	public String addBorrower(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
+		return "addborrower";
 	}
 
 	@RequestMapping(value = "/addBorrower", method = RequestMethod.POST)
-	public String addBorrowerPost(Locale locale, Model model,
-			WebRequest webRequest) throws SQLException {
+	public String addBorrowerPost(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 		String borName = webRequest.getParameter("borName");
 		String borAddress = webRequest.getParameter("borAddress");
 		String borPhone = webRequest.getParameter("borPhone");
 
-		try {
+		try
+		{
 			adminService.addBorrower(borName, borAddress, borPhone);
 			model.addAttribute("status", "success");
-		} catch (Exception E) {
+		}
+		catch (Exception E)
+		{
 			model.addAttribute("status", "Error");
 		}
 		return "status";
 	}
 
 	@RequestMapping(value = "/deleteBorrower", method = RequestMethod.GET)
-	public String DeleteBorrower(Locale locale, Model model,
-			WebRequest webRequest) throws SQLException {
+	public String DeleteBorrower(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
 		int borId = Integer.parseInt(webRequest.getParameter("borId"));
 
-		try {
-			model.addAttribute("borName", adminService.getBorrowerById(borId)
-					.getName());
+		try
+		{
+			model.addAttribute("borName", adminService.getBorrowerById(borId).getName());
 			String status = adminService.deleteborrower(borId);
 			model.addAttribute("status", status);
 
-		} catch (Exception E) {
+		}
+		catch (Exception E)
+		{
 			model.addAttribute("status", "Error Deleting Book");
 		}
-		return "deleteBorrower";
+		return "deleteborrower";
 	}
-	
-	
+
+	@RequestMapping(value = "/viewBookLibrary", method = RequestMethod.GET)
+	public String viewbookLibrary(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
+
+		int bookId = Integer.parseInt(webRequest.getParameter("bookId"));
+		int count = adminService.getLibrariesByBookCount(bookId);
+		String s = adminService.pagination("/training/getBookLibrary?bookId=" + bookId, count, 10);
+
+		model.addAttribute("pagination", s);
+
+		return "viewbooklibrary";
+
+	}
+
+	@RequestMapping(value = "/getBookLibrary", method = RequestMethod.GET)
+	public String getbookLibrary(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
+
+		int bookId = Integer.parseInt(webRequest.getParameter("bookId"));
+		int pageNo = Integer.parseInt(webRequest.getParameter("pageNo"));
+		int pageSize = Integer.parseInt(webRequest.getParameter("pageSize"));
+
+		List<Branch> branches = adminService.getLibrariesByBook(bookId, pageNo, pageSize);
+
+		StringBuffer sb = new StringBuffer("<table class='table' id='branchTable'><thead><tr><th>#</th><th>Branch Name</th><th>Address</th><th>Borrow Book</th></tr></thead><tbody>");
+		for (Branch branch : branches)
+			sb.append("<tr><td>" + branch.getBranchId() + "</td><td>" + branch.getBranchName() + "</td><td>" + branch.getBranchAddress() + "</td><td align='center'><a href='selectBorrower?branchId="
+					+ branch.getBranchId() + "&bookId=" + bookId + "'><button type='button' class='btn btn btn-primary' data-toggle='modal'>Borrow Book</button></a></td></tr>");
+
+		sb.append("<table>");
+		model.addAttribute("result", sb.toString());
+		return "result";
+
+	}
+
+	@RequestMapping(value = "/selectBorrower", method = RequestMethod.GET)
+	public String selectBorrower(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
+
+		int bookId = Integer.parseInt(webRequest.getParameter("bookId"));
+		int branchId = Integer.parseInt(webRequest.getParameter("branchId"));
+
+		int count = adminService.getAllBorrowersCount();
+		String s = adminService.pagination("/training/getSelectBorrower?bookId=" + bookId + "&branchId=" + branchId, count, 10);
+
+		model.addAttribute("pagination", s);
+
+		return "viewborrowerselect";
+	}
+
+	@RequestMapping(value = "/getSelectBorrower", method = RequestMethod.GET)
+	public String getSelectBorrowerData(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
+
+		List<Borrower> bor;
+
+		int bookId = Integer.parseInt(webRequest.getParameter("bookId"));
+		int branchId = Integer.parseInt(webRequest.getParameter("branchId"));
+
+		int pageNo = Integer.parseInt(webRequest.getParameter("pageNo"));
+		int pageSize = Integer.parseInt(webRequest.getParameter("pageSize"));
+		String searchString = webRequest.getParameter("searchString");
+
+		bor = (List<Borrower>) adminService.getAllBorrowers(pageNo, pageSize, searchString);
+
+		StringBuffer sb = new StringBuffer(
+				"<table class='table' id='borrowersTable'><thead><tr><th>#</th><th>Borrower Name</th><th>Borrower Address</th><th>Borrower phone</th><th>Borrow</th></tr></thead><tbody>");
+		for (Borrower bors : bor)
+			sb.append("<tr><td>" + bors.getCardNo() + "</td><td>" + bors.getName() + "</td><td>" + bors.getAddress() + "</td><td>" + bors.getPhoneNo()
+					+ "</td><td align='center'><a href='Borrow?borId=" + bors.getCardNo() + "&bookId=" + bookId + "&branchId=" + branchId
+					+ "'><button type='button' class='btn btn btn-primary'>Borrow Book</button></a></td></tr>");
+
+		sb.append("<table>");
+		model.addAttribute("result", sb.toString());
+		return "result";
+	}
+
+	@RequestMapping(value = "/Borrow", method = RequestMethod.GET)
+	public String Borrow(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
+
+		int bookId = Integer.parseInt(webRequest.getParameter("bookId"));
+		int branchId = Integer.parseInt(webRequest.getParameter("branchId"));
+		int cardNo = Integer.parseInt(webRequest.getParameter("borId"));
+
+		String bookName = adminService.getBookById(bookId).getTitle();
+		String branchName = adminService.getBranchById(branchId).getBranchName();
+		String borrowerName = adminService.getBorrowerById(cardNo).getName();
+
+		try
+		{
+			adminService.borrowBook(bookId, branchId, cardNo);
+			model.addAttribute("status", "success");
+			model.addAttribute("bookName", bookName);
+			model.addAttribute("branchName", branchName);
+			model.addAttribute("borrowerName", borrowerName);
+
+		}
+		catch (Exception E)
+		{
+			model.addAttribute("status", "Unable to borrow Book " + bookName + " from branch " + branchName);
+		}
+		return "statusBorrow";
+	}
+
 }

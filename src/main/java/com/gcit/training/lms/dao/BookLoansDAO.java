@@ -29,8 +29,8 @@ public class BookLoansDAO extends AbstractDAO implements ResultSetExtractor<List
 
 	public void create(BookLoans a) throws SQLException
 	{
-		template.update("insert into tbl_book_loans (bookId, branchId, cardNo, dateOut, dueDate, dateIn) values (?,?,?,?,?)", new Object[] { a.getBook().getBookId(), a.getBranch().getBranchId(),
-				a.getCard().getCardNo(), a.getDateOut(), a.getDueDate() });
+		template.update("insert into tbl_book_loans (bookId, branchId, cardNo, dateOut, dueDate) values (?,?,?,CURDATE(),DATE_ADD(CURDATE(), INTERVAL 7 DAY))", new Object[] { a.getBook().getBookId(), a.getBranch().getBranchId(),
+				a.getCard().getCardNo()});
 	}
 
 	public void update(BookLoans a) throws SQLException

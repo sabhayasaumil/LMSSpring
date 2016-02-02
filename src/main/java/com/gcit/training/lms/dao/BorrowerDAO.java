@@ -39,6 +39,16 @@ public class BorrowerDAO extends AbstractDAO implements ResultSetExtractor<List<
 		template.update("update tbl_borrower set phone = ? where cardNo = ?", new Object[]{a.getPhoneNo(), a.getCardNo()});
 	}
 	
+	public void updateCopiesInc(int bookId, int branchId)
+	{
+		template.update("update tbl_book_copies set noOfCopies = noOfCopies + 1 where bookId = ? AND branchId = ?", new Object[]{bookId, branchId});
+	}
+	
+	public void updateCopiesDec(int bookId, int branchId)
+	{
+		template.update("update tbl_book_copies set noOfCopies = noOfCopies - 1 where bookId = ? AND branchId = ?", new Object[]{bookId, branchId});
+	}
+	
 	public void delete(Borrower a) throws SQLException {
 		template.update("delete from tbl_borrower where cardNo = ?",new Object[]{a.getCardNo()});
 	}
@@ -90,12 +100,15 @@ public class BorrowerDAO extends AbstractDAO implements ResultSetExtractor<List<
 		Integer PageOffset = (pageNo - 1) * pageSize;
 		return (List<Borrower>)template.query("select * from tbl_borrower where phone like ? LIMIT ? OFFSET ?",new Object[]{qString, pageSize, PageOffset},this);
 	}
+	
+	
 
 	@Override
 	public List<Borrower> extractData(ResultSet rs) throws SQLException {
 		List<Borrower> aList = new ArrayList<Borrower>();
 		while(rs.next()) {
 			Borrower a = new Borrower();
+			a.setCardNo(rs.getInt("cardNo"));
 			a.setName(rs.getString("name"));
 			a.setAddress(rs.getString("address"));
 			a.setPhoneNo(rs.getString("phone"));
@@ -108,24 +121,24 @@ public class BorrowerDAO extends AbstractDAO implements ResultSetExtractor<List<
 
 	public int readAllCount()
 	{
-		return template.queryForObject("select count(*) from borrower",new Object[]{}, Integer.class);
+		return template.queryForObject("select count(*) from tbl_borrower",new Object[]{}, Integer.class);
 	}
 	
 	public int readByNameCount(String searchString)
 	{
 		String qString = "%" + searchString + "%";
-		return template.queryForObject("select count(*) from borrower where name like ? ",new Object[]{qString}, Integer.class);
+		return template.queryForObject("select count(*) from tbl_borrower where name like ? ",new Object[]{qString}, Integer.class);
 	}
 	
 	public int readByAddressCount(String searchString)
 	{
 		String qString = "%" + searchString + "%";
-		return template.queryForObject("select count(*) from borrower where address like ? ",new Object[]{qString}, Integer.class);
+		return template.queryForObject("select count(*) from tbl_borrower where address like ? ",new Object[]{qString}, Integer.class);
 	}
 	
 	public int readByPhoneCount(String searchString)
 	{
 		String qString = "%" + searchString + "%";
-		return template.queryForObject("select count(*) from borrower where phone like ? ",new Object[]{qString}, Integer.class);
+		return template.queryForObject("select count(*) from tbl_borrower where phone like ? ",new Object[]{qString}, Integer.class);
 	}
 }

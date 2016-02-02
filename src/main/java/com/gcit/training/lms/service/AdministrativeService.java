@@ -16,6 +16,7 @@ import com.gcit.training.lms.dao.GenreDAO;
 import com.gcit.training.lms.dao.PublisherDAO;
 import com.gcit.training.lms.entity.Author;
 import com.gcit.training.lms.entity.Book;
+import com.gcit.training.lms.entity.BookLoans;
 import com.gcit.training.lms.entity.Borrower;
 import com.gcit.training.lms.entity.Branch;
 import com.gcit.training.lms.entity.Genre;
@@ -44,6 +45,8 @@ public class AdministrativeService
 	
 	@Autowired
 	BranchDAO branchDao;
+	
+
 
 	@Transactional
 	public void addAuthor(String authorName) throws SQLException
@@ -359,4 +362,57 @@ public class AdministrativeService
 		return branchDao.readAllCount();
 	}
 
+	public List<Branch> getLibrariesByBook(int bookId, int pageNo, int pageSize)
+	{
+		// TODO Auto-generated method stub
+		return branchDao.readByBook(bookId,pageNo, pageSize);
+	}
+	
+	public int getLibrariesByBookCount(int bookId)
+	{
+		return branchDao.readByBookCount(bookId);
+
+	}
+
+	public String pagination(String url, int count, int pageSize)
+	{
+		StringBuffer sb = new StringBuffer("<script src=\"./resources/template/pagination.js\"></script>");
+
+		int totalPage = ((count) / pageSize);
+
+		if (count % pageSize != 0)
+			totalPage++;
+		
+		sb.append("<nav><ul class='pagination'>");
+
+		for (int i = 1; i <= totalPage; i++)
+			// sb.append("<li><a  href = 'javascript:populate(" + url +
+			// "pageNo=" + i + "&pageSize=" + pageSize + ")'>" + i +
+			// "</a></li>");
+			sb.append("<li><a   class='paginationClass' data-href='" + url + "&pageNo=" + i + "&pageSize=" + pageSize + "' >" + i + "</a></li>");
+
+		sb.append("</ul></nav>");
+
+		return sb.toString();
+	}
+
+	@Transactional
+	public void borrowBook(int bookId, int branchId, int cardNo) throws SQLException
+	{
+			borrowerDao.updateCopiesDec(bookId, branchId);
+			BookLoans loan = new BookLoans();
+			loan.setBook(bookDao.readOne(bookId));
+			loan.setBranch(branchDao.readOne(branchId));
+			loan.setCard(borrowerDao.readOne(cardNo));
+			bookLoansDao.create(loan);
+		
+		
+	}
+	
+	public Book getBookById(int bookId) throws SQLException
+	{
+		return bookDao.readOne(bookId);
+	}
+
+	
 }

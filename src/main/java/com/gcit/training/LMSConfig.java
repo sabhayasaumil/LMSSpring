@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gcit.training.lms.dao.AuthorDAO;
 import com.gcit.training.lms.dao.BookDAO;
@@ -17,6 +19,7 @@ import com.gcit.training.lms.dao.GenreDAO;
 import com.gcit.training.lms.dao.PublisherDAO;
 import com.gcit.training.lms.service.AdministrativeService;
 
+@EnableTransactionManagement
 @Configuration	
 public class LMSConfig
 {	

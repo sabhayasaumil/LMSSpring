@@ -50,7 +50,7 @@ public class BookDAO extends AbstractDAO implements ResultSetExtractor<List<Book
 
 	public void insertAuthor(Book book, int authorId)
 	{
-		template.update("insert into tbl_book_authors (authorId,bookId) values ((select authorId from tbl_author where authorId = ?),(select bookId from tbl_book where bookId = ?))", new Object[] { authorId, book.getBookId() });
+		template.update("insert into tbl_book_authors (authorId,bookId) values (?,?)", new Object[] { authorId, book.getBookId() });
 	}
 
 	public void insertGenre(Book book, int genre_id)

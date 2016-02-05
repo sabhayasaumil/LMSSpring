@@ -117,9 +117,28 @@ public class BranchDAO extends AbstractDAO implements ResultSetExtractor<List<Br
 		
 	}
 	
+	public List<Branch> readByBook(int bookId, int pageNo, int pageSize, String searchString)
+	{
+		searchString = "%" + searchString + "%";
+		
+		if (pageNo == 0)
+			pageNo++;
+		Integer PageOffset = (pageNo - 1) * pageSize;
+		
+		return template.query("select * from tbl_library_branch where branchId in (select branchId from tbl_book_copies where bookId = ? AND noOfCopies > 0) AND branchName LIKE ? LIMIT ? OFFSET ?", new Object[]{bookId, searchString, pageSize, PageOffset}, this);
+		
+	}
+	
 	public Integer readByBookCount(int bookId)
 	{
 		return template.queryForObject(" select count(*) from tbl_library_branch where branchId in (select branchId from tbl_book_copies where bookId =? AND noOfCopies > 0)", new Object[]{bookId}, Integer.class);
+	
+	}
+	
+	public Integer readByBookCount(int bookId, String searchString)
+	{
+		searchString = "%" + searchString + "%";
+		return template.queryForObject(" select count(*) from tbl_library_branch where branchId in (select branchId from tbl_book_copies where bookId =? AND noOfCopies > 0) AND branchName LIKE ?", new Object[]{bookId, searchString}, Integer.class);
 	
 	}
 }

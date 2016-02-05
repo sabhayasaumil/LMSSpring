@@ -40,6 +40,15 @@
 	
 </div>
 
+<form action="viewBookLibrary" method="get">
+<input type="hidden" name="bookId" value='${bookId}'/>
+<div class="input-group">
+  <span class="input-group-addon" id="basic-addon1">Search</span>
+  <input type="text" class="form-control" value='${searchResult}' placeholder="Username" aria-describedby="basic-addon1" name="searchString" >
+</div>
+<button type="submit" class="btn btn-sm btn-primary">Search!</button>
+</form>
+
 <div class="row">
 	<div class="col-md-6" id = "pageData">
 		

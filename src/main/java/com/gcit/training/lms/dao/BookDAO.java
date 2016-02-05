@@ -45,7 +45,18 @@ public class BookDAO extends AbstractDAO implements ResultSetExtractor<List<Book
 	public void update(Book a) throws SQLException
 	{
 
-		template.update("update tbl_book set title = ? where bookId = ?", new Object[] { a.getTitle(), a.getBookId() });
+		template.update("update tbl_book set title = ?, pubId = ? where bookId = ?", new Object[] { a.getTitle(), a.getPublisher().getPublisherId(), a.getBookId() });
+	}
+	
+	
+	public void removeAuthor(Book book)
+	{
+		template.update("delete from tbl_book_authors where bookId = ?", new Object[] {book.getBookId()});
+	}
+	
+	public void removeGenre(Book book)
+	{
+		template.update("delete from tbl_book_genres where bookId = ?", new Object[] {book.getBookId()});
 	}
 
 	public void insertAuthor(Book book, int authorId)

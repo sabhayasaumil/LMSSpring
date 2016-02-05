@@ -34,7 +34,7 @@
 							$('#SuccessEdit').delay(5000).fadeOut('slow');
 						} else {
 							$("#ErrorEdit").show();
-							alert("There was a problem updating author.");
+							alert("There was a problem updating genre.");
 							$('#ErrorEdit').delay(5000).fadeOut('slow');
 						}
 						$("#myModal1").modal("toggle");

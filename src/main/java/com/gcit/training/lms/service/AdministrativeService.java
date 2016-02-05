@@ -252,8 +252,7 @@ public class AdministrativeService
 		borrowerDao.create(bor);
 	}
 
-	public List<Borrower> getAllBorrowers(int pageNo, int pageSize,
-			String searchString) throws SQLException {
+	public List<Borrower> getBorrowers(int pageNo, int pageSize, String searchString) throws SQLException {
 		if (StringUtils.hasLength(searchString))
 			return borrowerDao.readByName(searchString, pageNo, pageSize);
 		else
@@ -362,19 +361,25 @@ public class AdministrativeService
 		return branchDao.readAllCount();
 	}
 
-	public List<Branch> getLibrariesByBook(int bookId, int pageNo, int pageSize)
+	public List<Branch> getLibrariesByBook(int bookId, int pageNo, int pageSize, String searchString)
 	{
 		// TODO Auto-generated method stub
-		return branchDao.readByBook(bookId,pageNo, pageSize);
+		if(searchString.trim() == null)
+			return branchDao.readByBook(bookId,pageNo, pageSize);
+		else
+			return branchDao.readByBook(bookId,pageNo,pageSize, searchString);
 	}
 	
-	public int getLibrariesByBookCount(int bookId)
+	public int getLibrariesByBookCount(int bookId, String searchString)
 	{
+		if(searchString.trim() == null)
 		return branchDao.readByBookCount(bookId);
+		
+		return branchDao.readByBookCount(bookId, searchString);
 
 	}
 
-	public String pagination(String url, int count, int pageSize)
+	public String pagination(String url, int count, int pageSize, String searchString)
 	{
 		StringBuffer sb = new StringBuffer("<script src=\"./resources/template/pagination.js\"></script>");
 
@@ -382,6 +387,9 @@ public class AdministrativeService
 
 		if (count % pageSize != 0)
 			totalPage++;
+		
+		if(searchString.trim() != null)
+			url = url + "&searchString=" + searchString;
 		
 		sb.append("<nav><ul class='pagination'>");
 
@@ -412,6 +420,37 @@ public class AdministrativeService
 	public Book getBookById(int bookId) throws SQLException
 	{
 		return bookDao.readOne(bookId);
+	}
+
+	public List<Author> getAuthorsByBookId(Book book) throws SQLException
+	{
+		// TODO Auto-generated method stub
+		return adao.readByBook(book);
+	}
+	
+	public List<Genre> getGenresByBookId(Book book) throws SQLException
+	{
+		// TODO Auto-generated method stub
+		return genreDao.readByBook(book);
+	}
+
+	public String updateBook(int bookId, String title, String authors, String genres, String publisher) throws NumberFormatException, SQLException
+	{
+		Book book = new Book();
+		book.setTitle(title);
+		book.setPublisher(publisherDao.readOne(Integer.parseInt(publisher)));
+		book.setBookId(bookId);
+		
+		bookDao.update(book);
+		bookDao.removeAuthor(book);
+		bookDao.removeGenre(book);
+		
+		for (String author : authors.split(","))
+			bookDao.insertAuthor(book, Integer.parseInt(author));
+		for (String genre : genres.split(","))
+			bookDao.insertGenre(book, Integer.parseInt(genre));
+
+		return "success";
 	}
 
 	

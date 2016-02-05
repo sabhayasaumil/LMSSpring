@@ -9,6 +9,8 @@ public class Book {
 	private String title;
 	private Publisher publisher;
 	private List<Author> authors;
+	private List<Genre> genres;
+
 	
 	public int getBookId() {
 		return bookId;
@@ -34,10 +36,13 @@ public class Book {
 	public void setAuthors(List<Author> authors) {
 		this.authors = authors;
 	}
-	public void addAuthor(Author a) {
-		if(this.authors == null)
-			this.authors = new ArrayList<Author>();
-		this.authors.add(a);
+	public List<Genre> getGenres()
+	{
+		return genres;
 	}
-	
+	public void setGenres(List<Genre> genres)
+	{
+		this.genres = genres;
+	}
+
 }

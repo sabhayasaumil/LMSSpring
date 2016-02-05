@@ -260,8 +260,8 @@ public class HomeController
 					+ book.getTitle()
 					+ "</td><td align='center'><a href='viewBookLibrary?bookId="
 					+ book.getBookId()
-					+ "'><button type='button' class='btn btn btn-primary' >See in Library</button></a></td><td align='center'><button type='button' class='btn btn btn-primary' data-toggle='modal' data-target='#myModal1' href='editBook?bookId="
-					+ book.getBookId() + "'>Edit Book</button></td><td><button type='button' class='btn btn-sm btn-danger' onclick=\"javascript:location.href='deleteBook?bookId=" + book.getBookId()
+					+ "'><button type='button' class='btn btn btn-primary' >See in Library</button></a></td><td align='center'><a href='editBook?bookId="
+					+ book.getBookId() + "'><button type='button' class='btn btn btn-primary'>Edit Book</button></a></td><td><button type='button' class='btn btn-sm btn-danger' onclick=\"javascript:location.href='deleteBook?bookId=" + book.getBookId()
 					+ "';\">Delete Book</button></td></tr>");
 
 		sb.append("<table>");
@@ -297,6 +297,49 @@ public class HomeController
 
 		return "status";
 	}
+	
+	@RequestMapping(value = "/editBook", method = RequestMethod.GET)
+	public String editBook(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
+
+		int bookId = Integer.parseInt(webRequest.getParameter("bookId"));
+		
+		int Count = adminService.getAllAuthorsCount();
+		List<Author> authors = adminService.getAllAuthors(1, Count, new String());
+		List<Genre> genres = adminService.getAllGenre();
+		List<Publisher> publishers = adminService.getAllPublisher();
+
+		
+		model.addAttribute("authors", authors);
+		model.addAttribute("genres", genres);
+		model.addAttribute("publishers", publishers);
+		
+		Book book = adminService.getBookById(bookId);
+		book.setAuthors(adminService.getAuthorsByBookId(book));
+		book.setGenres(adminService.getGenresByBookId(book));
+		
+		model.addAttribute("book", book);
+		
+		return "editbook";
+		
+	}
+	
+	@RequestMapping(value = "/editBook", method = RequestMethod.POST)
+	public String editBookPost(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
+		int bookId = Integer.parseInt(webRequest.getParameter("bookId"));
+		String authors = webRequest.getParameter("authors");
+		String genres = webRequest.getParameter("genres");
+		String title = webRequest.getParameter("title");
+		String publisher = webRequest.getParameter("publisher");
+
+		
+		String status = adminService.updateBook(bookId, title, authors, genres, publisher);
+		model.addAttribute("status", status);
+		model.addAttribute("title", title);
+		return "statusbookedit";
+	}
+	
 
 	@RequestMapping(value = "/viewGenre", method = RequestMethod.GET)
 	public String viewGenre(Locale locale, Model model, WebRequest webRequest) throws SQLException
@@ -323,7 +366,7 @@ public class HomeController
 
 		genres = (List<Genre>) adminService.getAllGenre(pageNo, pageSize, searchString);
 
-		StringBuffer sb = new StringBuffer("<table class='table' id='authorsTable'><thead><tr><th>#</th><th>Author Name</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
+		StringBuffer sb = new StringBuffer("<table class='table' id='authorsTable'><thead><tr><th>#</th><th>Genre</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
 		for (Genre genre : genres)
 			sb.append("<tr><td>" + genre.getGenreId() + "</td><td>" + genre.getGenreName()
 					+ "</td><td align='center'><button type='button' class='btn btn btn-primary' data-toggle='modal' data-target='#myModal1' href='editGenre?genreId=" + genre.getGenreId()
@@ -608,7 +651,7 @@ public class HomeController
 		int pageSize = Integer.parseInt(webRequest.getParameter("pageSize"));
 		String searchString = webRequest.getParameter("searchString");
 
-		bor = (List<Borrower>) adminService.getAllBorrowers(pageNo, pageSize, searchString);
+		bor = (List<Borrower>) adminService.getBorrowers(pageNo, pageSize, searchString);
 
 		StringBuffer sb = new StringBuffer(
 				"<table class='table' id='borrowersTable'><thead><tr><th>#</th><th>Borrower Name</th><th>Borrower Address</th><th>Borrower phone</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
@@ -739,11 +782,18 @@ public class HomeController
 	{
 
 		int bookId = Integer.parseInt(webRequest.getParameter("bookId"));
-		int count = adminService.getLibrariesByBookCount(bookId);
-		String s = adminService.pagination("/training/getBookLibrary?bookId=" + bookId, count, 10);
+		
+		String searchString = webRequest.getParameter("searchString");
+		if(searchString == null)
+			searchString = new String();
+		
+		int count = adminService.getLibrariesByBookCount(bookId,searchString);
+		
+		String s = adminService.pagination("/training/getBookLibrary?bookId=" + bookId, count, 10, searchString);
 
 		model.addAttribute("pagination", s);
-
+		model.addAttribute("bookId",bookId);
+		model.addAttribute("searchResult", searchString);
 		return "viewbooklibrary";
 
 	}
@@ -755,8 +805,12 @@ public class HomeController
 		int bookId = Integer.parseInt(webRequest.getParameter("bookId"));
 		int pageNo = Integer.parseInt(webRequest.getParameter("pageNo"));
 		int pageSize = Integer.parseInt(webRequest.getParameter("pageSize"));
+		String searchString = webRequest.getParameter("searchString");
 
-		List<Branch> branches = adminService.getLibrariesByBook(bookId, pageNo, pageSize);
+		if(searchString == null)
+			searchString = new String();
+		
+		List<Branch> branches = adminService.getLibrariesByBook(bookId, pageNo, pageSize, searchString);
 
 		StringBuffer sb = new StringBuffer("<table class='table' id='branchTable'><thead><tr><th>#</th><th>Branch Name</th><th>Address</th><th>Borrow Book</th></tr></thead><tbody>");
 		for (Branch branch : branches)
@@ -777,10 +831,19 @@ public class HomeController
 		int branchId = Integer.parseInt(webRequest.getParameter("branchId"));
 
 		int count = adminService.getAllBorrowersCount();
-		String s = adminService.pagination("/training/getSelectBorrower?bookId=" + bookId + "&branchId=" + branchId, count, 10);
+		String searchString = webRequest.getParameter("searchString");
+
+		if(searchString == null)
+			searchString = new String();
+		
+		String s = adminService.pagination("/training/getSelectBorrower?bookId=" + bookId + "&branchId=" + branchId, count, 10, searchString);
 
 		model.addAttribute("pagination", s);
+		model.addAttribute("searchResult", searchString);
 
+		model.addAttribute("bookId", bookId);
+		model.addAttribute("branchId", branchId);
+		
 		return "viewborrowerselect";
 	}
 
@@ -793,12 +856,12 @@ public class HomeController
 		int bookId = Integer.parseInt(webRequest.getParameter("bookId"));
 		int branchId = Integer.parseInt(webRequest.getParameter("branchId"));
 
-		int pageNo = Integer.parseInt(webRequest.getParameter("pageNo"));
-		int pageSize = Integer.parseInt(webRequest.getParameter("pageSize"));
 		String searchString = webRequest.getParameter("searchString");
 
-		bor = (List<Borrower>) adminService.getAllBorrowers(pageNo, pageSize, searchString);
+		int pageNo = Integer.parseInt(webRequest.getParameter("pageNo"));
+		int pageSize = Integer.parseInt(webRequest.getParameter("pageSize"));
 
+		bor = (List<Borrower>) adminService.getBorrowers(pageNo, pageSize, searchString);
 		StringBuffer sb = new StringBuffer(
 				"<table class='table' id='borrowersTable'><thead><tr><th>#</th><th>Borrower Name</th><th>Borrower Address</th><th>Borrower phone</th><th>Borrow</th></tr></thead><tbody>");
 		for (Borrower bors : bor)
@@ -806,8 +869,13 @@ public class HomeController
 					+ "</td><td align='center'><a href='Borrow?borId=" + bors.getCardNo() + "&bookId=" + bookId + "&branchId=" + branchId
 					+ "'><button type='button' class='btn btn btn-primary'>Borrow Book</button></a></td></tr>");
 
+		
+		
+		
 		sb.append("<table>");
+
 		model.addAttribute("result", sb.toString());
+		
 		return "result";
 	}
 
@@ -836,7 +904,7 @@ public class HomeController
 		{
 			model.addAttribute("status", "Unable to borrow Book " + bookName + " from branch " + branchName);
 		}
-		return "statusBorrow";
+		return "statusborrow";
 	}
 
 }

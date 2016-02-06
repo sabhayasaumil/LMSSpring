@@ -24,6 +24,7 @@ public class BorrowerDAO extends AbstractDAO implements ResultSetExtractor<List<
 		}
 
 	public void update(Borrower a) throws SQLException {
+
 		template.update("update tbl_borrower set name = ?, address = ?, phone = ? where cardNo = ?", new Object[]{a.getName(), a.getAddress(), a.getPhoneNo(), a.getCardNo()});
 	}
 
@@ -39,15 +40,6 @@ public class BorrowerDAO extends AbstractDAO implements ResultSetExtractor<List<
 		template.update("update tbl_borrower set phone = ? where cardNo = ?", new Object[]{a.getPhoneNo(), a.getCardNo()});
 	}
 	
-	public void updateCopiesInc(int bookId, int branchId)
-	{
-		template.update("update tbl_book_copies set noOfCopies = noOfCopies + 1 where bookId = ? AND branchId = ?", new Object[]{bookId, branchId});
-	}
-	
-	public void updateCopiesDec(int bookId, int branchId)
-	{
-		template.update("update tbl_book_copies set noOfCopies = noOfCopies - 1 where bookId = ? AND branchId = ?", new Object[]{bookId, branchId});
-	}
 	
 	public void delete(Borrower a) throws SQLException {
 		template.update("delete from tbl_borrower where cardNo = ?",new Object[]{a.getCardNo()});

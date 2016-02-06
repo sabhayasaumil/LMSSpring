@@ -12,7 +12,7 @@
 <div class="alert alert-danger" role="alert" id="#ErrorEdit" style="display:none;">
   <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
   <span class="sr-only">Error:</span>
-  Updating Failed
+  Updation Failed
 </div>
 <div class="alert alert-success" role="alert" id="#SuccessEdit" style="display:none;">
   <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
@@ -21,32 +21,22 @@
 </div>
 
 
+
 <div class="page-header">
 	<h1>List of Branches in LMS Application</h1>
 	
 </div>
-<form action="searchBranch" method="get">
+<form action="viewBranch" method="get">
 <div class="input-group">
   <span class="input-group-addon" id="basic-addon1">Search</span>
   <input type="text" class="form-control" value='${searchResult}' placeholder="Branche Name" aria-describedby="basic-addon1" name="searchString" >
 </div>
 <button type="submit" class="btn btn-sm btn-primary">Search!</button>
 </form>
-<%
-	AdministrativeService adminService = new AdministrativeService();
 
-	if(request.getAttribute("pagination")==null)
-	{
-		out.write(adminService.pagination("", null, adminService.getAllBooksCount(), 10));
-	
-	}
-	else
-	{
-		%>
-			${pagination}
-		<%		
-	}
-%>
+	${pagination}
+
+
 <div class="row">
 	<div class="col-md-6" id = "pageData">
 		

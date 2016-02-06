@@ -12,6 +12,7 @@ import com.gcit.training.lms.dao.BookDAO;
 import com.gcit.training.lms.dao.BookLoansDAO;
 import com.gcit.training.lms.dao.BorrowerDAO;
 import com.gcit.training.lms.dao.BranchDAO;
+import com.gcit.training.lms.dao.CopiesDAO;
 import com.gcit.training.lms.dao.GenreDAO;
 import com.gcit.training.lms.dao.PublisherDAO;
 import com.gcit.training.lms.entity.Author;
@@ -19,6 +20,7 @@ import com.gcit.training.lms.entity.Book;
 import com.gcit.training.lms.entity.BookLoans;
 import com.gcit.training.lms.entity.Borrower;
 import com.gcit.training.lms.entity.Branch;
+import com.gcit.training.lms.entity.Copies;
 import com.gcit.training.lms.entity.Genre;
 import com.gcit.training.lms.entity.Publisher;
 
@@ -45,6 +47,9 @@ public class AdministrativeService
 	
 	@Autowired
 	BranchDAO branchDao;
+	
+	@Autowired
+	CopiesDAO copiesDao;
 	
 
 
@@ -77,7 +82,7 @@ public class AdministrativeService
 		Author author = new Author();
 		author.setAuthorId(authorId);
 
-		if (bookDao.readByAuthor(author).size() != 0)
+		if (bookDao.getCountByAuthor(authorId,new String()) > 0)
 			return "Unable to delete author, Author is a writer of some of the books owned by library";
 
 		adao.delete(author);
@@ -115,16 +120,17 @@ public class AdministrativeService
 			totalPage++;
 		sb.append("<nav><ul class='pagination'>");
 
-		url = url + "?";
+		if(!url.contains("?"))
+			url = url + "?";
 
 		if (StringUtils.hasLength(searchString))
-			url = url + "searchString=" + searchString + "&";
+			url = url + "&searchString=" + searchString;
 
 		for (int i = 1; i <= totalPage; i++)
 			// sb.append("<li><a  href = 'javascript:populate(" + url +
 			// "pageNo=" + i + "&pageSize=" + pageSize + ")'>" + i +
 			// "</a></li>");
-			sb.append("<li><a   class='paginationClass' data-href='" + url + "pageNo=" + i + "&pageSize=" + pageSize + "' >" + i + "</a></li>");
+			sb.append("<li><a   class='paginationClass' data-href='" + url + "&pageNo=" + i + "&pageSize=" + pageSize + "' >" + i + "</a></li>");
 
 		sb.append("</ul></nav>");
 
@@ -232,18 +238,20 @@ public class AdministrativeService
 
 	}
 
+	@Transactional
 	public String deleteGenre(int genreId) throws SQLException
 	{
 		Genre a = new Genre();
 		a.setGenreId(genreId);
 
-		if (bookDao.readByGenre(a).size() != 0)
+		if (bookDao.readByGenre(a,new String(), 1, 50).size() != 0)
 			return "Unable to delete Genre, Genre is used for some of the books in library";
 
 		genreDao.delete(a);
 		return "success";
 	}
 	
+	@Transactional
 	public void addBorrower(String borName, String borAddress, String borPhone) throws SQLException {
 		Borrower bor = new Borrower();
 		bor.setName(borName);
@@ -266,7 +274,7 @@ public class AdministrativeService
 	}
 
 	@Transactional
-	public String deleteborrower(Integer borId) throws SQLException {
+	public String deleteBorrower(Integer borId) throws SQLException {
 		Borrower bor = new Borrower();
 		bor.setCardNo(borId);
 
@@ -282,6 +290,7 @@ public class AdministrativeService
 		bor.setName(borName);
 		bor.setAddress(borAddress);
 		bor.setPhoneNo(borPhone);
+		bor.setCardNo(borId);
 		borrowerDao.update(bor);
 	}
 
@@ -327,11 +336,14 @@ public class AdministrativeService
 		Branch lb = new Branch();
 		lb.setBranchId(branchId);
 		
+		copiesDao.deleteByBranchId(lb);
+		bookLoansDao.deleteByBranchId(branchId);
 		branchDao.delete(lb);
 
 		return "success";
 	}
 
+	@Transactional
 	public void updateBranch(Integer branchId, String branchName,
 			String branchAddress) throws SQLException {
 		Branch lb = new Branch();
@@ -356,8 +368,10 @@ public class AdministrativeService
 		return branchDao.readOne(branchId);
 	}
 
-	public int getAllBranchesCount() throws SQLException {
+	public int getBranchesCount(String searchString) throws SQLException {
 
+		if(StringUtils.hasLength(searchString))
+			return branchDao.readByNameCount(searchString);
 		return branchDao.readAllCount();
 	}
 
@@ -379,35 +393,11 @@ public class AdministrativeService
 
 	}
 
-	public String pagination(String url, int count, int pageSize, String searchString)
-	{
-		StringBuffer sb = new StringBuffer("<script src=\"./resources/template/pagination.js\"></script>");
-
-		int totalPage = ((count) / pageSize);
-
-		if (count % pageSize != 0)
-			totalPage++;
-		
-		if(searchString.trim() != null)
-			url = url + "&searchString=" + searchString;
-		
-		sb.append("<nav><ul class='pagination'>");
-
-		for (int i = 1; i <= totalPage; i++)
-			// sb.append("<li><a  href = 'javascript:populate(" + url +
-			// "pageNo=" + i + "&pageSize=" + pageSize + ")'>" + i +
-			// "</a></li>");
-			sb.append("<li><a   class='paginationClass' data-href='" + url + "&pageNo=" + i + "&pageSize=" + pageSize + "' >" + i + "</a></li>");
-
-		sb.append("</ul></nav>");
-
-		return sb.toString();
-	}
 
 	@Transactional
 	public void borrowBook(int bookId, int branchId, int cardNo) throws SQLException
 	{
-			borrowerDao.updateCopiesDec(bookId, branchId);
+			copiesDao.updateCopiesInc(bookId, branchId, -1);
 			BookLoans loan = new BookLoans();
 			loan.setBook(bookDao.readOne(bookId));
 			loan.setBranch(branchDao.readOne(branchId));
@@ -434,6 +424,7 @@ public class AdministrativeService
 		return genreDao.readByBook(book);
 	}
 
+	@Transactional
 	public String updateBook(int bookId, String title, String authors, String genres, String publisher) throws NumberFormatException, SQLException
 	{
 		Book book = new Book();
@@ -452,6 +443,133 @@ public class AdministrativeService
 
 		return "success";
 	}
+
+	public int getBooksCountByAuthor(int authorId, String searchString)
+	{
+		return bookDao.getCountByAuthor(authorId,searchString);
+	}
+
+	public List<Book> getBooksByAuthor(int authorId, int pageNo, int pageSize, String searchString) throws SQLException
+	{
+		return bookDao.readByAuthor(adao.readOne(authorId), searchString, pageNo, pageSize);
+	}
+	
+	public List<Book> getBooksByGenre(int genreId, int pageNo, int pageSize, String searchString) throws SQLException
+	{
+		return bookDao.readByGenre(genreDao.readOne(genreId), searchString, pageNo, pageSize);
+	}
+	
+	@Transactional
+	public String deleteBook(int bookId, String Title) throws SQLException
+	{
+		// TODO Auto-generated method stub
+		Book book = new Book();
+		book.setBookId(bookId);
+		if(copiesDao.readTotalCopiesByBookId(bookId) > 0)
+			return "Cant delete Book " + Title + " Its owned by Libraries and they still have copies";
+		
+		copiesDao.deleteBooks(book);
+		bookDao.removeAuthor(book);
+		bookDao.removeGenre(book);
+		
+		bookDao.delete(book);
+		
+		return "success";
+	}
+
+	public int getBooksCountByGenre(int genreId, String searchString)
+	{
+		return bookDao.getCountByGenre(genreId,searchString);
+	}
+
+	public int getBookByBranchIdCount(int branchId, String searchString)
+	{
+		return copiesDao.getBookByBranchIdCount(branchId, searchString);
+	}
+
+	public List<Copies> getCopiesByBranchId(int branchId, int pageNo, int pageSize, String searchString) throws SQLException
+	{
+		return copiesDao.readByBranch(branchId, searchString, pageNo, pageSize);
+	}
+
+	public void addNoOfCopies(int bookId, int branchId, int change)
+	{
+		
+		copiesDao.updateCopiesInc(bookId, branchId, change);
+	}
+
+	public List<Book> getBooksNotInBranch(int branchId)
+	{
+		// TODO Auto-generated method stub
+		return bookDao.readNotInBranch(branchId);
+	}
+
+	@Transactional
+	public void addCopiesOfBook(int bookId, int branchId, int copies)
+	{
+		// TODO Auto-generated method stub
+		Copies copy =new Copies();
+		copiesDao.create(bookId, branchId, copies);
+		
+	}
+
+	public int getDueTodayCount()
+	{
+		return bookLoansDao.getDueTodayCount();
+	}
+
+	public List<BookLoans> getDueToday(int pageNo, int pageSize)
+	{
+		// TODO Auto-generated method stub
+		return bookLoansDao.getDueToday(pageNo, pageSize);
+	}
+	
+	public int getDueAllCount()
+	{
+		return bookLoansDao.getDueAllCount();
+	}
+
+	public List<BookLoans> getDueAll(int pageNo, int pageSize)
+	{
+		// TODO Auto-generated method stub
+		return bookLoansDao.getDueAll(pageNo, pageSize);
+	}
+
+	public String returnBook(Book book, Branch branch, Borrower bor) throws SQLException
+	{
+		// TODO Auto-generated method stub
+		
+		BookLoans loan = new BookLoans();
+		loan.setBook(book);
+		loan.setBranch(branch);
+		loan.setCard(bor);
+		
+		bookLoansDao.updateDateIn(loan);
+		
+		return "success";
+	}
+
+	public int getAllCountForBorrower(int borId)
+	{
+		return bookLoansDao.getAllCountByBorId(borId);
+	}
+	
+	public int getDueCountForBorrower(int borId)
+	{
+		return bookLoansDao.getDueCountByBorId(borId);
+	}
+	
+	public List<BookLoans> getAllForBorrower(int borId, int pageNo, int pageSize)
+	{
+		return bookLoansDao.getAllByBorId(borId, pageNo, pageSize);
+	}
+	
+	public List<BookLoans> getDueForBorrower(int borId, int pageNo, int pageSize)
+	{
+		return bookLoansDao.getDueByBorId(borId, pageNo, pageSize);
+	}
+	
+	
 
 	
 }

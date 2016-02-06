@@ -32,20 +32,8 @@
 </div>
 <button type="submit" class="btn btn-sm btn-primary">Search!</button>
 </form>
-<%
-	AdministrativeService adminService = new AdministrativeService();
+	${pagination}
 
-	if(request.getAttribute("pagination")==null)
-	{
-		out.write(adminService.pagination("", null, adminService.getAllAuthorsCount(), 10));
-	
-	}
-	else
-	{
-		%>
-			${pagination}
-		<%		
-	}
 %>
 <div class="row">
 	<div class="col-md-6" id = "pageData">

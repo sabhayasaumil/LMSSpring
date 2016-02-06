@@ -10,7 +10,7 @@
 
 
 <div class="page-header">
-	<h1>List of Borrowers in LMS Application</h1>
+	<h1>List of borrowers for borrowing book ${title} from ${branchName}</h1>
 	
 </div>
 
@@ -24,25 +24,13 @@
 <button type="submit" class="btn btn-sm btn-primary">Search!</button>
 </form>
 
-<%
-	AdministrativeService adminService = new AdministrativeService();
+	${pagination}
 
-	if(request.getAttribute("pagination")==null)
-	{
-		out.write(adminService.pagination("", null, adminService.getAllAuthorsCount(), 10));
-	
-	}
-	else
-	{
-		%>
-			${pagination}
-		<%		
-	}
-%>
 <div class="row">
 	<div class="col-md-6" id = "pageData">
 		
 	</div>
+	
 </div>
 
 <div id="myModal1" class="modal fade" tabindex="-1" role="dialog"

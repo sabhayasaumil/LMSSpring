@@ -9,9 +9,8 @@
       <div class="row">
         <div class="col-sm-4">
           <ul class="list-group">
-            <li class="list-group-item"><a href="viewBook"> View Book</a></li>
-            <li class="list-group-item"><a href="viewAllBooksDue"> Return a Book</a></li>
-            <li class="list-group-item"><a href="viewBorrower"> Select Borrower</a></li>
+            <li class="list-group-item"><a href="viewHistory?borId=${borId}"> View History</a></li>
+            <li class="list-group-item"><a href="viewDue?borId=${borId}"> Return a Book</a></li>
           </ul>
         </div><!-- /.col-sm-4 -->
 </div>

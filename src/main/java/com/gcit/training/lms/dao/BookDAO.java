@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.util.StringUtils;
 
 import com.gcit.training.lms.entity.Author;
 import com.gcit.training.lms.entity.Book;
@@ -34,11 +35,9 @@ public class BookDAO extends AbstractDAO implements ResultSetExtractor<List<Book
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		Integer pubId = a.getPublisher().getPublisherId();
 
-		
-		
 		template.update("insert into tbl_book (title, pubId) values (?,?) ", new Object[] { a.getTitle(), pubId });
-		
-		return template.queryForObject("select LAST_INSERT_ID();", new Object[]{}, Integer.class);
+
+		return template.queryForObject("select LAST_INSERT_ID();", new Object[] {}, Integer.class);
 
 	}
 
@@ -47,16 +46,15 @@ public class BookDAO extends AbstractDAO implements ResultSetExtractor<List<Book
 
 		template.update("update tbl_book set title = ?, pubId = ? where bookId = ?", new Object[] { a.getTitle(), a.getPublisher().getPublisherId(), a.getBookId() });
 	}
-	
-	
+
 	public void removeAuthor(Book book)
 	{
-		template.update("delete from tbl_book_authors where bookId = ?", new Object[] {book.getBookId()});
+		template.update("delete from tbl_book_authors where bookId = ?", new Object[] { book.getBookId() });
 	}
-	
+
 	public void removeGenre(Book book)
 	{
-		template.update("delete from tbl_book_genres where bookId = ?", new Object[] {book.getBookId()});
+		template.update("delete from tbl_book_genres where bookId = ?", new Object[] { book.getBookId() });
 	}
 
 	public void insertAuthor(Book book, int authorId)
@@ -113,14 +111,31 @@ public class BookDAO extends AbstractDAO implements ResultSetExtractor<List<Book
 
 	}
 
-	public List<Book> readByAuthor(Author author) throws SQLException
+	public List<Book> readByAuthor(Author author, String searchString, int pageNo, int pageSize) throws SQLException
 	{
-		return (List<Book>) template.query("select * from tbl_book Where bookId in (select bookId from tbl_book_authors where authorId = ?)", new Object[] { author.getAuthorId() }, this);
+		
+		if (pageNo == 0)
+			pageNo++;
+		Integer PageOffset = (pageNo - 1) * pageSize;
+		
+		if (!StringUtils.hasLength(searchString))
+			return (List<Book>) template.query("select * from tbl_book Where bookId in (select bookId from tbl_book_authors where authorId = ?) LIMIT ? OFFSET ?", new Object[] { author.getAuthorId() , pageSize , PageOffset}, this);
+		
+		searchString = "%" + searchString + "%";
+		return (List<Book>) template.query("select * from tbl_book Where bookId in (select bookId from tbl_book_authors where authorId = ?) AND title LIKE ? LIMIT ? OFFSET ?", new Object[] { author.getAuthorId(), searchString, pageSize , PageOffset }, this);
 	}
 
-	public List<Book> readByGenre(Genre genre) throws SQLException
+	public List<Book> readByGenre(Genre genre, String searchString, int pageNo, int pageSize) throws SQLException
 	{
-		return (List<Book>) template.query("select * from tbl_book Where bookId in (select bookId from tbl_book_genres where genre_id = ?)", new Object[] { genre.getGenreId() }, this);
+		if (pageNo == 0)
+			pageNo++;
+		Integer PageOffset = (pageNo - 1) * pageSize;
+		
+		if (!StringUtils.hasLength(searchString))
+			return (List<Book>) template.query("select * from tbl_book Where bookId in (select bookId from tbl_book_genres where genre_id = ?) LIMIT ? OFFSET ?", new Object[] { genre.getGenreId(), pageSize , PageOffset }, this);
+	
+		searchString = "%" + searchString + "%";
+		return (List<Book>) template.query("select * from tbl_book Where bookId in (select bookId from tbl_book_genres where genre_id = ?) AND title LIKE ? LIMIT ? OFFSET ?", new Object[] { genre.getGenreId(), searchString, pageSize , PageOffset }, this);
 	}
 
 	public List<Book> readByPublisher(Publisher publisher) throws SQLException
@@ -153,5 +168,30 @@ public class BookDAO extends AbstractDAO implements ResultSetExtractor<List<Book
 	{
 		searchString = "%" + searchString + "%";
 		return template.queryForObject("select count(*) from tbl_book where title like ?", new Object[] { searchString }, Integer.class);
+	}
+
+	public int getCountByAuthor(int authorId, String searchString)
+	{
+		if (!StringUtils.hasLength(searchString))
+			return template.queryForObject("select count(*) from tbl_book Where bookId in (select bookId from tbl_book_authors where authorId = ?)", new Object[] { authorId }, Integer.class);
+		
+		searchString = "%" + searchString + "%";
+		return template.queryForObject("select count(*) from tbl_book Where bookId in (select bookId from tbl_book_authors where authorId = ?) AND title LIKE ?", new Object[] { authorId, searchString },Integer.class);
+	}
+
+	public int getCountByGenre(int genreId, String searchString)
+	{
+		if (!StringUtils.hasLength(searchString))
+			return template.queryForObject("select count(*) from tbl_book Where bookId in (select bookId from tbl_book_genres where genre_id = ?)", new Object[] { genreId }, Integer.class);
+		
+		searchString = "%" + searchString + "%";
+		return template.queryForObject("select count(*) from tbl_book Where bookId in (select bookId from tbl_book_genres where genre_id = ?) AND title LIKE ?", new Object[] { genreId, searchString },Integer.class);
+	
+	}
+
+	public List<Book> readNotInBranch(int branchId)
+	{
+		// TODO Auto-generated method stub
+		return template.query("select * from tbl_book where bookId NOT IN (select bookId from tbl_book_copies where branchId = ?)", new Object[]{branchId}, this);
 	}
 }

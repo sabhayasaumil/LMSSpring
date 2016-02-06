@@ -7,21 +7,7 @@
 <%@ page import="com.gcit.training.lms.dao.AuthorDAO"%>
 <%@ page import="java.util.List"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%
-	AdministrativeService adminService = new AdministrativeService();
 
-	if(request.getAttribute("pagination")==null)
-	{
-		out.write(adminService.pagination("", null, adminService.getAllAuthorsCount(), 10));
-	
-	}
-	else
-	{
-		%>
-			${pagination}
-		<%		
-	}
-%>
 
 <div class="alert alert-danger" role="alert" id="#ErrorEdit" style="display:none;">
   <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
@@ -46,6 +32,9 @@
 </div>
 <button type="submit" class="btn btn-sm btn-primary">Search!</button>
 </form>
+
+	${pagination}
+
 
 <div class="row">
 	<div class="col-md-6" id = "pageData">

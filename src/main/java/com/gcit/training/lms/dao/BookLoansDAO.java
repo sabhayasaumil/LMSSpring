@@ -35,14 +35,19 @@ public class BookLoansDAO extends AbstractDAO implements ResultSetExtractor<List
 
 	public void update(BookLoans a) throws SQLException
 	{
-		template.update("update tbl_book_loan set dateIn = ? where bookId = ? AND branchId = ? AND cardNo = ? AND dateOut = ?", new Object[] { a.getDateIn(), a.getBook().getBookId(),
+		template.update("update tbl_book_loans set dateIn = ? where bookId = ? AND branchId = ? AND cardNo = ? AND dateOut = ?", new Object[] { a.getDateIn(), a.getBook().getBookId(),
 				a.getBranch().getBranchId(), a.getCard().getCardNo(), a.getDateOut() });
 	}
 
 	public void updateDueDate(BookLoans a) throws SQLException
 	{
-		template.update("update tbl_book_loan set dueDate = ? where bookId = ? AND branchId = ? AND cardNo = ? AND dateOut = ?", new Object[] { a.getDueDate(), a.getBook().getBookId(),
+		template.update("update tbl_book_loans set dueDate = ? where bookId = ? AND branchId = ? AND cardNo = ? AND dateOut = ?", new Object[] { a.getDueDate(), a.getBook().getBookId(),
 				a.getBranch().getBranchId(), a.getCard().getCardNo(), a.getDateOut() });
+	}
+	
+	public void updateDateIn(BookLoans a) throws SQLException
+	{
+		template.update("update tbl_book_loans set dateIn = CURDATE() where bookId = ? AND branchId = ? AND cardNo = ?", new Object[] { a.getBook().getBookId(),a.getBranch().getBranchId(), a.getCard().getCardNo() });
 	}
 
 	public void delete(BookLoans a) throws SQLException
@@ -141,4 +146,59 @@ public class BookLoansDAO extends AbstractDAO implements ResultSetExtractor<List
 		return aList;
 
 	}
+
+	public int getDueTodayCount()
+	{
+		return template.queryForObject("select count(*) from tbl_book_loans where dueDate = cast(now() as date) AND dateIn IS NULL", new Object[] {}, Integer.class);
+	}
+	
+	public List<BookLoans> getDueToday(int pageNo, int pageSize)
+	{
+		if (pageNo == 0)
+			pageNo++;
+		Integer PageOffset = (pageNo - 1) * pageSize;
+		
+		return template.query("select * from tbl_book_loans where dueDate = cast(now() as date) AND dateIn IS NULL LIMIT ? OFFSET ?", new Object[] { pageSize, PageOffset }, this);
+	}
+	
+	public int getDueAllCount()
+	{
+		return template.queryForObject("select count(*) from tbl_book_loans where dateIn IS NULL", new Object[] {}, Integer.class);
+	}
+
+	public List<BookLoans> getDueAll(int pageNo, int pageSize)
+	{
+		if (pageNo == 0)
+			pageNo++;
+		Integer PageOffset = (pageNo - 1) * pageSize;
+		
+		return template.query("select * from tbl_book_loans where dateIn IS NULL LIMIT ? OFFSET ?", new Object[] { pageSize, PageOffset }, this);
+	}
+
+	public int getAllCountByBorId(int borId)
+	{
+		return template.queryForObject("select count(*) from tbl_book_loans where cardNo = ?", new Object[] {borId}, Integer.class);
+	}
+	
+	public List<BookLoans> getAllByBorId(int borId, int pageNo, int pageSize)
+	{
+		if (pageNo == 0)
+			pageNo++;
+		Integer PageOffset = (pageNo - 1) * pageSize;
+		return template.query("select * from tbl_book_loans where cardNo = ? LIMIT ? OFFSET ?", new Object[] {borId , pageSize, PageOffset}, this);
+	}
+	
+	public int getDueCountByBorId(int borId)
+	{
+		return template.queryForObject("select count(*) from tbl_book_loans where dateIn IS NULL AND cardNo = ?", new Object[] {borId}, Integer.class);
+	}
+	
+	public List<BookLoans> getDueByBorId(int borId, int pageNo, int pageSize)
+	{
+		if (pageNo == 0)
+			pageNo++;
+		Integer PageOffset = (pageNo - 1) * pageSize;
+		return template.query("select * from tbl_book_loans where dateIn IS NULL AND cardNo = ? LIMIT ? OFFSET ?", new Object[] {borId, pageSize, PageOffset}, this);
+	}
+	
 }

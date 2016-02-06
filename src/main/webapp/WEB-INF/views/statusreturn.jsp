@@ -8,8 +8,8 @@
 
 	<div class="alert alert-success" role="alert" id="#ErrorEdit">
 		<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-		<span class="sr-only">Success: </span> Branch Successfully deleted. successfully
-		deleted.
+		<span class="sr-only">Success: </span> ${borrowerName} successfuly
+		returned borrowed book ${bookName} to branch ${branchName}.
 	</div>
 
 	<%

@@ -535,6 +535,7 @@ public class AdministrativeService
 		return bookLoansDao.getDueAll(pageNo, pageSize);
 	}
 
+	@Transactional
 	public String returnBook(Book book, Branch branch, Borrower bor) throws SQLException
 	{
 		// TODO Auto-generated method stub
@@ -545,7 +546,7 @@ public class AdministrativeService
 		loan.setCard(bor);
 		
 		bookLoansDao.updateDateIn(loan);
-		
+		copiesDao.updateCopiesInc(book.getBookId(), branch.getBranchId(), 1);
 		return "success";
 	}
 
@@ -568,8 +569,27 @@ public class AdministrativeService
 	{
 		return bookLoansDao.getDueByBorId(borId, pageNo, pageSize);
 	}
+
+	public int getHistoryCount(String searchString)
+	{
+		return bookLoansDao.getHistoryCount(searchString);
+	}
 	
-	
+	public List<BookLoans> getHistory(String searchString, int pageNo, int pageSize)
+	{
+		return bookLoansDao.getHistory(searchString, pageNo, pageSize);
+	}
+
+	public int getBookByBranchCount(String searchString)
+	{
+		return copiesDao.getCount(searchString);
+	}
+
+	public List<Copies> getCopies(int pageNo, int pageSize, String searchString)
+	{
+		// TODO Auto-generated method stub
+		return copiesDao.getCopies(searchString, pageNo, pageSize);
+	}
 
 	
 }

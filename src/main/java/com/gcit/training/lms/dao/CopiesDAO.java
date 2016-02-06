@@ -143,5 +143,31 @@ public class CopiesDAO extends AbstractDAO implements ResultSetExtractor<List<Co
 		return template.queryForObject("select count(*) from tbl_book_copies where bookId in (select bookId from tbl_book where title like ?) AND branchId = ?",new Object[]{searchString, branchId} ,Integer.class);
 	}
 
+	public int getCount(String searchString)
+	{
+		// TODO Auto-generated method stub
+		
+		
+		if(searchString == null)
+			return template.queryForObject("select count(*) from tbl_book_copies", new Object[]{}, Integer.class);
+		
+		searchString = "%" + searchString + "%";
+			return template.queryForObject("select count(*) from tbl_book_copies where bookId in (select bookId from tbl_book where title LIKE ?) OR branchId in (select branchId from tbl_library_branch where branchName LIKE ?)", new Object[]{searchString, searchString}, Integer.class);
+	}
+	
+	public List<Copies> getCopies(String searchString, int pageNo, int pageSize)
+	{
+		// TODO Auto-generated method stub
+		if (pageNo == 0)
+			pageNo++;
+		Integer PageOffset = (pageNo - 1) * pageSize;
+		
+		if(searchString == null)
+			return template.query("select * from tbl_book_copies LIMIT ? OFFSET ?", new Object[]{pageSize, PageOffset}, this);
+		
+		searchString = "%" + searchString + "%";
+			return template.query("select * from tbl_book_copies where bookId in (select bookId from tbl_book where title LIKE ?) OR branchId in (select branchId from tbl_library_branch where branchName LIKE ?) LIMIT ? OFFSET ?", new Object[]{searchString, searchString, pageSize, PageOffset}, this);
+	}
+
 	
 }

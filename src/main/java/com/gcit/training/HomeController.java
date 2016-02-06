@@ -1204,14 +1204,20 @@ public class HomeController
 		List<BookLoans> loans = adminService.getDueToday(pageNo, pageSize);
 
 		StringBuffer sb = new StringBuffer(
-				"<table class='table' id='loanTable'><thead><tr><th>Borrower Name</th><th>Borrower Address</th><th>Borrower phone</th><th>Book Title</th><th>Branch</th><th>Date Borrowed</th><th>Due Date</th><th>Due In</th><th>Return Book</th></tr></thead><tbody>");
+				"<table class='table' id='loanTable'><thead><tr><th>Borrower Name</th><th>Borrower Address</th><th>Borrower phone</th><th>Book Title</th><th>Branch</th><th>Date Borrowed</th><th>Due Date</th><th>Date In</th><th>Return Book</th></tr></thead><tbody>");
 		for (BookLoans loan : loans)
+		{
 			sb.append("<tr><td>" + loan.getCard().getName() + "</td><td>" + loan.getCard().getAddress() + "</td><td>" + loan.getCard().getPhoneNo() + "</td><td>" + loan.getBook().getTitle()
-					+ "</td><td>" + loan.getBranch().getBranchName() + "</td><td>" + loan.getDateOut() + "</td><td>" + loan.getDueDate() + "</td><td>" + loan.getDateIn()
-					+ "</td><td align='center'><a href='return?borId=" + loan.getCard().getCardNo() + "&bookId=" + loan.getBook().getBookId() + "&branchId=" + loan.getBranch().getBranchId()
-					+ "'><button type='button' class='btn btn btn-primary'>Return Book</button></a></td></tr>");
 
-		sb.append("</table>");
+			+ "</td><td>" + loan.getBranch().getBranchName() + "</td><td>" + loan.getDateOut() + "</td><td>" + loan.getDueDate() + "</td><td align='center'>");
+
+			if (loan.getDateIn() != null)
+				sb.append(loan.getDateIn());
+			else
+				sb.append("<a href='return?borId=" + loan.getCard().getCardNo() + "&bookId=" + loan.getBook().getBookId() + "&branchId=" + loan.getBranch().getBranchId()
+					+ "'><button type='button' class='btn btn btn-primary'>Return Book</button></a>");
+			sb.append("</td></tr>");
+		}
 
 		model.addAttribute("result", sb.toString());
 
@@ -1241,21 +1247,20 @@ public class HomeController
 		List<BookLoans> loans = adminService.getDueAll(pageNo, pageSize);
 
 		StringBuffer sb = new StringBuffer(
-				"<table class='table' id='loanTable'><thead><tr><th>Borrower Name</th><th>Borrower Address</th><th>Borrower phone</th><th>Book Title</th><th>Branch</th><th>Date Borrowed</th><th>Due Date</th><th>Due In</th><th>Return Book</th></tr></thead><tbody>");
+				"<table class='table' id='loanTable'><thead><tr><th>Borrower Name</th><th>Borrower Address</th><th>Borrower phone</th><th>Book Title</th><th>Branch</th><th>Date Borrowed</th><th>Due Date</th><th>Date In</th></tr></thead><tbody>");
 		for (BookLoans loan : loans)
 		{
 			sb.append("<tr><td>" + loan.getCard().getName() + "</td><td>" + loan.getCard().getAddress() + "</td><td>" + loan.getCard().getPhoneNo() + "</td><td>" + loan.getBook().getTitle()
 
-			+ "</td><td>" + loan.getBranch().getBranchName() + "</td><td>" + loan.getDateOut() + "</td><td>" + loan.getDueDate() + "</td><td>");
+			+ "</td><td>" + loan.getBranch().getBranchName() + "</td><td>" + loan.getDateOut() + "</td><td>" + loan.getDueDate() + "</td><td align='center'>");
 
 			if (loan.getDateIn() != null)
 				sb.append(loan.getDateIn());
 			else
-				sb.append("-");
-			sb.append("</td><td align='center'><a href='return?borId=" + loan.getCard().getCardNo() + "&bookId=" + loan.getBook().getBookId() + "&branchId=" + loan.getBranch().getBranchId()
-					+ "'><button type='button' class='btn btn btn-primary'>Return Book</button></a></td></tr>");
+				sb.append("<a href='return?borId=" + loan.getCard().getCardNo() + "&bookId=" + loan.getBook().getBookId() + "&branchId=" + loan.getBranch().getBranchId()
+					+ "'><button type='button' class='btn btn btn-primary'>Return Book</button></a>");
+			sb.append("</td></tr>");
 		}
-		sb.append("</table>");
 
 		model.addAttribute("result", sb.toString());
 
@@ -1327,7 +1332,7 @@ public class HomeController
 		List<BookLoans> loans = adminService.getAllForBorrower(borId, pageNo, pageSize);
 
 		StringBuffer sb = new StringBuffer(
-				"<table class='table' id='loanTable'><thead><tr><th>Borrower Name</th><th>Borrower Address</th><th>Borrower phone</th><th>Book Title</th><th>Branch</th><th>Date Borrowed</th><th>Due Date</th><th>Due In</th></tr></thead><tbody>");
+				"<table class='table' id='loanTable'><thead><tr><th>Borrower Name</th><th>Borrower Address</th><th>Borrower phone</th><th>Book Title</th><th>Branch</th><th>Date Borrowed</th><th>Due Date</th><th>Date In</th></tr></thead><tbody>");
 		for (BookLoans loan : loans)
 		{
 			sb.append("<tr><td>" + loan.getCard().getName() + "</td><td>" + loan.getCard().getAddress() + "</td><td>" + loan.getCard().getPhoneNo() + "</td><td>" + loan.getBook().getTitle()
@@ -1374,7 +1379,7 @@ public class HomeController
 		List<BookLoans> loans = adminService.getDueForBorrower(borId, pageNo, pageSize);
 
 		StringBuffer sb = new StringBuffer(
-				"<table class='table' id='loanTable'><thead><tr><th>Borrower Name</th><th>Borrower Address</th><th>Borrower phone</th><th>Book Title</th><th>Branch</th><th>Date Borrowed</th><th>Due Date</th><th>Due In</th></tr></thead><tbody>");
+				"<table class='table' id='loanTable'><thead><tr><th>Borrower Name</th><th>Borrower Address</th><th>Borrower phone</th><th>Book Title</th><th>Branch</th><th>Date Borrowed</th><th>Due Date</th><th>Date In</th></tr></thead><tbody>");
 		for (BookLoans loan : loans)
 		{
 			sb.append("<tr><td>" + loan.getCard().getName() + "</td><td>" + loan.getCard().getAddress() + "</td><td>" + loan.getCard().getPhoneNo() + "</td><td>" + loan.getBook().getTitle()
@@ -1391,6 +1396,112 @@ public class HomeController
 		sb.append("</table>");
 
 		model.addAttribute("result", sb.toString());
+
+		return "result";
+	}
+	
+	@RequestMapping(value = "/entireHistory", method = RequestMethod.GET)
+	public String entireHistory(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
+	
+		String searchString = webRequest.getParameter("searchString");
+		if (searchString == null)
+			searchString = new String();
+		int count = adminService.getHistoryCount(searchString);
+		String s = adminService.pagination("/training/getEntireHistory", searchString, count, 10);
+
+		if (s.trim() == null)
+			s = "No History Found.";
+		model.addAttribute("pagination", s);
+		model.addAttribute("searchResult", searchString);
+		model.addAttribute("title", "All Due books");
+		return "viewentirehistory";
+	}
+
+	@RequestMapping(value = "/getEntireHistory", method = RequestMethod.GET)
+	public String getEntireHistory(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
+
+		int pageNo = Integer.parseInt(webRequest.getParameter("pageNo"));
+		int pageSize = Integer.parseInt(webRequest.getParameter("pageSize"));
+		String searchString = webRequest.getParameter("searchString");
+		if (searchString == null)
+			searchString = new String();
+		
+		List<BookLoans> loans = adminService.getHistory(searchString, pageNo, pageSize);
+
+		StringBuffer sb = new StringBuffer(
+				"<table class='table' id='loanTable'><thead><tr><th>Borrower Name</th><th>Borrower Address</th><th>Borrower phone</th><th>Book Title</th><th>Branch</th><th>Date Borrowed</th><th>Due Date</th><th>Date In</th></tr></thead><tbody>");
+		for (BookLoans loan : loans)
+		{
+			sb.append("<tr><td>" + loan.getCard().getName() + "</td><td>" + loan.getCard().getAddress() + "</td><td>" + loan.getCard().getPhoneNo() + "</td><td>" + loan.getBook().getTitle()
+
+			+ "</td><td>" + loan.getBranch().getBranchName() + "</td><td>" + loan.getDateOut() + "</td><td>" + loan.getDueDate() + "</td><td align='center'>");
+
+			if (loan.getDateIn() != null)
+				sb.append(loan.getDateIn());
+			else
+				sb.append("<a href='return?borId=" + loan.getCard().getCardNo() + "&bookId=" + loan.getBook().getBookId() + "&branchId=" + loan.getBranch().getBranchId()
+					+ "'><button type='button' class='btn btn btn-primary'>Return Book</button></a>");
+			sb.append("</td></tr>");
+		}
+		sb.append("</table>");
+
+		model.addAttribute("result", sb.toString());
+
+		return "result";
+	}
+
+	
+	@RequestMapping(value = "/viewCopies", method = RequestMethod.GET)
+	public String viewCopies(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
+
+		String searchString = webRequest.getParameter("searchString");
+		if (!StringUtils.hasLength(searchString))
+			searchString = new String();
+
+		int count = adminService.getBookByBranchCount(searchString);
+
+		String s = adminService.pagination("/training/getCopiesData", searchString, count, 10);
+
+		model.addAttribute("pagination", s);
+		model.addAttribute("searchResult", searchString);
+		return "viewcopies";
+	}
+
+	@RequestMapping(value = "/getCopiesData", method = RequestMethod.GET)
+	public String getCopiesData(Locale locale, Model model, WebRequest webRequest) throws SQLException
+	{
+
+		int pageNo = Integer.parseInt(webRequest.getParameter("pageNo"));
+		int pageSize = Integer.parseInt(webRequest.getParameter("pageSize"));
+		String searchString = webRequest.getParameter("searchString");
+		if (!StringUtils.hasLength(searchString))
+			searchString = new String();
+
+		List<Copies> copies = adminService.getCopies(pageNo, pageSize, searchString);
+
+		StringBuffer sb = new StringBuffer(
+				"<table class='table' id='bookBranchTable'><thead><tr><th>Book Title</th><th>Branch Name</th><th>no Of Copies.</th><th>Borrow Book</th><th>Edit No of Copies</th></tr></thead><tbody>");
+		for (Copies copy : copies)
+			sb.append("<tr><td>"
+					+ copy.getBook().getTitle()
+					+ "</td><td>"
+					+ copy.getBranch().getBranchName()
+					+ "</td><td>"
+					+ copy.getNoOfCopies()
+					+ "</td><td align='center'><a href='selectBorrower?branchId="
+					+ copy.getBranch().getBranchId()
+					+ "&bookId="
+					+ copy.getBook().getBookId()
+					+ "'><button type='button' class='btn btn btn-primary'>Borrow Book</button></a></td><td><button type='button' class='btn btn btn-primary' data-toggle='modal' data-target='#myModal1' href='editNoOfCopies?branchId="
+					+ copy.getBranch().getBranchId() + "&bookId=" + copy.getBook().getBookId() + "'>Edit Copies</button></td></tr>");
+
+		sb.append("</table>");
+		model.addAttribute("result", sb.toString());
+
+		model.addAttribute("searchResult", searchString);
 
 		return "result";
 	}

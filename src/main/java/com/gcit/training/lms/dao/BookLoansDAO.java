@@ -200,5 +200,29 @@ public class BookLoansDAO extends AbstractDAO implements ResultSetExtractor<List
 		Integer PageOffset = (pageNo - 1) * pageSize;
 		return template.query("select * from tbl_book_loans where dateIn IS NULL AND cardNo = ? LIMIT ? OFFSET ?", new Object[] {borId, pageSize, PageOffset}, this);
 	}
+
+	public int getHistoryCount(String searchString)
+	{
+		if(searchString == null)
+			return template.queryForObject("select count(*) from tbl_book_loans",new Object[]{},Integer.class);
+		
+		searchString = "%" + searchString + "%";
+			
+		return template.queryForObject("select count(*) from tbl_book_loans where bookId in (select bookId from tbl_book where title Like ?) OR branchId in (select branchId from tbl_library_branch where branchName like ?) OR cardNo in (select cardNo from tbl_borrower where Name LIKE ?)",new Object[]{searchString, searchString, searchString},Integer.class);
+	}
+	
+	public List<BookLoans> getHistory(String searchString, int pageNo, int pageSize)
+	{
+		if (pageNo == 0)
+			pageNo++;
+		Integer PageOffset = (pageNo - 1) * pageSize;
+		
+		if(searchString == null)
+			return template.query("select * from tbl_book_loans LIMIT ? OFFSET ?",new Object[]{pageSize, PageOffset},this);
+		
+		searchString = "%" + searchString + "%";
+			
+		return template.query("select * from tbl_book_loans where bookId in (select bookId from tbl_book where title Like ?) OR branchId in (select branchId from tbl_library_branch where branchName like ?) OR cardNo in (select cardNo from tbl_borrower where Name LIKE ?) LIMIT ? OFFSET ?",new Object[]{searchString, searchString, searchString, pageSize, PageOffset},this);
+	}
 	
 }

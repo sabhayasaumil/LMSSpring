@@ -18,6 +18,7 @@
             <li class="list-group-item"><a href="viewBranch"> View Branch</a></li>
             <li class="list-group-item"><a href="viewBooksDue"> Books Due Today</a></li>
             <li class="list-group-item"><a href="viewAllBooksDue"> All Due Books</a></li>
+            <li class="list-group-item"><a href="entireHistory"> Entire History</a></li>
 
           </ul>
         </div><!-- /.col-sm-4 -->

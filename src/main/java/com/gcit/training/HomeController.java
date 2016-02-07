@@ -416,8 +416,9 @@ public class HomeController
 		String publisher = webRequest.getParameter("publisher");
 
 		String status = adminService.addBook(title, authors, genres, publisher);
-
-		return "status";
+		model.addAttribute("status", status);
+		model.addAttribute("title", title);
+		return "statusbookadd";
 	}
 
 	@RequestMapping(value = "/editBook", method = RequestMethod.GET)

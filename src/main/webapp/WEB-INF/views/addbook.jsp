@@ -66,7 +66,11 @@
 			$('#addBook').on('submit', function(e) {
 				e.preventDefault();
 				var param = "authors="+$("#authors").val()+"&genres="+$("#genres").val()+"&publisher="+$("#publisher").val()+"&title="+$("#title").val();
-			    $.post("addBook", param)
+			    $.post("addBook", param).done(function( data ) {
+			    	$('#addBook').remove();
+			        $(".modal-content").html(data);
+			        $("#myModal1").modal("toggle");
+			    });
 				/*
 				e.preventDefault();
 				request.setAttribute("authors",$("#authors").val());

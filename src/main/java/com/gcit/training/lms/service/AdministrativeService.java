@@ -181,7 +181,6 @@ public class AdministrativeService
 		book.setPublisher(publisherDao.readOne(Integer.parseInt(publisher)));
 		int bookId = bookDao.create(book);
 		book.setBookId(bookId);
-		System.out.println(bookId);
 		for (String author : authors.split(","))
 			bookDao.insertAuthor(book, Integer.parseInt(author));
 		for (String genre : genres.split(","))

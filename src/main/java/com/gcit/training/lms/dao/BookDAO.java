@@ -1,12 +1,16 @@
 package com.gcit.training.lms.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -29,15 +33,38 @@ public class BookDAO extends AbstractDAO implements ResultSetExtractor<List<Book
 	@Autowired
 	PublisherDAO publisherDao;
 
-	public int create(Book a) throws SQLException
+	@Autowired
+	BasicDataSource dataSource;
+	
+	
+	public int create(Book book) throws SQLException
 	{
+		
+		
+		final String title = book.getTitle();
+		final int pubId = book.getPublisher().getPublisherId();
+		//final int pubId = book.getPublisher().getPublisherId();
+		final String INSERT_SQL = "insert into tbl_book (title, pubId) values (?, ?) ";
 
 		KeyHolder keyHolder = new GeneratedKeyHolder();
-		Integer pubId = a.getPublisher().getPublisherId();
+		template.update(new PreparedStatementCreator() {
+			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+				PreparedStatement ps = connection.prepareStatement(INSERT_SQL, new String[] { "id" });
+				ps.setString(1, title);
+				ps.setInt(2, pubId);
+				return ps;
+			}
+		}, keyHolder);
+		return keyHolder.getKey().intValue();
+		
+		
+		
+		//KeyHolder keyHolder = new GeneratedKeyHolder();
+		//Integer pubId = a.getPublisher().getPublisherId();
 
-		template.update("insert into tbl_book (title, pubId) values (?,?) ", new Object[] { a.getTitle(), pubId });
+		//template.update("insert into tbl_book (title, pubId) values (?,?) ", new Object[] { a.getTitle(), pubId });
 
-		return template.queryForObject("select LAST_INSERT_ID();", new Object[] {}, Integer.class);
+		//return template.queryForObject("select LAST_INSERT_ID();", new Object[] {}, Integer.class);
 
 	}
 

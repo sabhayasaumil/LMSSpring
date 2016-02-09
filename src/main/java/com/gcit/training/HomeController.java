@@ -307,12 +307,14 @@ public class HomeController
 
 		books = (List<Book>) adminService.getAllBooks(pageNo, pageSize, searchString);
 
-		StringBuffer sb = new StringBuffer("<table class='table' id='booksTable'><thead><tr><th>#</th><th>Book Title</th><th>Library</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
+		StringBuffer sb = new StringBuffer("<table class='table' id='booksTable'><thead><tr><th>#</th><th>Book Title</th><th>Publisher</th><th>Library</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
 		for (Book book : books)
 			sb.append("<tr><td>"
 					+ book.getBookId()
 					+ "</td><td>"
 					+ book.getTitle()
+					+ "</td><td>"
+					+ book.getPublisher().getPublisherName()
 					+ "</td><td align='center'><a href='viewBookLibrary?bookId="
 					+ book.getBookId()
 					+ "'><button type='button' class='btn btn btn-primary' >See in Library</button></a></td><td align='center'><a href='editBook?bookId="
